@@ -1,5 +1,6 @@
 // ── 특별 이미지 대상 이름 목록 ──────────────────────
   const specialNames = ['박지수', '유시오', '박지해', '조주선', '신금진', '윤민교', '정우진'];
+  const blockedNames = ['이용채', '이민형'];
 
   async function findImage(name) {
     const exts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
@@ -31,14 +32,64 @@
     if (n === 2) positionNoBtn();
   }
 
+  function rectsOverlap(a, b, padding = 0) {
+    return !(
+      a.right < b.left - padding ||
+      a.left > b.right + padding ||
+      a.bottom < b.top - padding ||
+      a.top > b.bottom + padding
+    );
+  }
+
+  function getNoButtonSafePosition() {
+    const noBtn = document.getElementById('noBtn');
+    const yesBtn = document.querySelector('.btn-yes');
+    const margin = 20;
+    const gap = 28;
+    const yesRect = yesBtn.getBoundingClientRect();
+    const maxX = Math.max(margin, window.innerWidth - noBtn.offsetWidth - margin);
+    const maxY = Math.max(margin, window.innerHeight - noBtn.offsetHeight - margin);
+
+    for (let i = 0; i < 80; i++) {
+      const x = Math.random() * (maxX - margin) + margin;
+      const y = Math.random() * (maxY - margin) + margin;
+      const nextRect = {
+        left: x,
+        top: y,
+        right: x + noBtn.offsetWidth,
+        bottom: y + noBtn.offsetHeight
+      };
+
+      if (!rectsOverlap(nextRect, yesRect, gap)) {
+        return { x, y };
+      }
+    }
+
+    const corners = [
+      { x: margin, y: margin },
+      { x: maxX, y: margin },
+      { x: margin, y: maxY },
+      { x: maxX, y: maxY }
+    ];
+    const yesCenterX = yesRect.left + yesRect.width / 2;
+    const yesCenterY = yesRect.top + yesRect.height / 2;
+
+    return corners.sort((a, b) => {
+      const distA = Math.hypot(a.x - yesCenterX, a.y - yesCenterY);
+      const distB = Math.hypot(b.x - yesCenterX, b.y - yesCenterY);
+      return distB - distA;
+    })[0];
+  }
+
   function positionNoBtn() {
     const btn = document.getElementById('noBtn');
     const card = document.querySelector('#screen2 .card');
     if (!card) return;
-    const rect = card.getBoundingClientRect();
-    btn.style.left = (rect.left + rect.width / 2 + 24) + 'px';
-    btn.style.top  = (rect.top + 290) + 'px';
+
     btn.style.display = 'inline-block';
+    const position = getNoButtonSafePosition();
+    btn.style.left = position.x + 'px';
+    btn.style.top = position.y + 'px';
   }
 
   // ── 도망가는 아니오 버튼 ──────────────────────────────
@@ -59,13 +110,14 @@
   function runAway() {
     runCount++;
     const btn = document.getElementById('noBtn');
-    const margin = 20;
-    const newX = Math.random() * (window.innerWidth  - btn.offsetWidth  - margin) + margin;
-    const newY = Math.random() * (window.innerHeight - btn.offsetHeight - margin) + margin;
-    btn.style.transition = 'left 0.22s cubic-bezier(.34,1.4,.64,1), top 0.22s cubic-bezier(.34,1.4,.64,1), transform 0.15s';
-    btn.style.left = newX + 'px'; btn.style.top = newY + 'px';
-    btn.style.transform = `rotate(${(Math.random()-0.5)*30}deg)`;
     growYesBtn();
+
+    const position = getNoButtonSafePosition();
+    btn.style.transition = 'left 0.22s cubic-bezier(.34,1.4,.64,1), top 0.22s cubic-bezier(.34,1.4,.64,1), transform 0.15s';
+    btn.style.left = position.x + 'px';
+    btn.style.top = position.y + 'px';
+    btn.style.transform = `rotate(${(Math.random()-0.5)*30}deg)`;
+
     const msgs = ['','어라?','잡아봐요~','못 잡겠지?😏','빠르죠?🏃','헉헉..','제발...😂','안 잡힌다!','도망중🚨','이건 못 누름ㅋ'];
     document.getElementById('runCounter').textContent = runCount >= msgs.length ? `${runCount}번 도망갔어요 🏃💨` : msgs[runCount];
   }
@@ -126,11 +178,37 @@
     submitBtn.style.boxShadow = '';
   }
 
+  function closeModal() {
+    document.getElementById('modal').classList.remove('show');
+  }
+
+  function showBossModal() {
+    document.getElementById('modalEmoji').textContent = '🚨';
+    document.getElementById('modalTitle').textContent = '혹시...? 대표님이세요..?';
+    document.getElementById('modalMsg').innerHTML = '죄송하지만 초대를 받지 않으셨어요~^ㅁ^';
+
+    const imgEl = document.getElementById('specialImg');
+    imgEl.style.display = 'none';
+    imgEl.removeAttribute('src');
+    imgEl.removeAttribute('alt');
+
+    document.getElementById('modalCloseBtn').classList.add('show');
+    document.getElementById('modal').classList.add('show');
+  }
+
+  function showSuccessModal(name) {
+    document.getElementById('modalEmoji').textContent = '🎊';
+    document.getElementById('modalTitle').textContent = '제출 완료!';
+    document.getElementById('modalCloseBtn').classList.remove('show');
+    document.getElementById('modal').classList.add('show');
+  }
+
   function setupEventListeners() {
     const startBtn = document.getElementById('startBtn');
     const yesBtn = document.getElementById('yesBtn');
     const noBtn = document.getElementById('noBtn');
     const submitBtn = document.getElementById('submitBtn');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
 
     if (startBtn) startBtn.addEventListener('click', () => goToScreen(2));
     if (yesBtn) yesBtn.addEventListener('click', () => goToScreen(3));
@@ -139,6 +217,7 @@
       noBtn.addEventListener('touchstart', runAway);
     }
     if (submitBtn) submitBtn.addEventListener('click', submitForm);
+    if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
 
     document.querySelectorAll('input[name="menu"]').forEach(radio => {
       radio.addEventListener('change', () => {
@@ -157,6 +236,7 @@
   async function submitForm() {
     const name = document.getElementById('nameInput').value.trim();
     const selected = document.querySelector('input[name="menu"]:checked');
+    const isBlockedName = blockedNames.some(blockedName => name.includes(blockedName));
 
     if (!name) {
       const inp = document.getElementById('nameInput');
@@ -164,6 +244,38 @@
       setTimeout(() => { inp.style.borderColor = ''; }, 1500);
       return;
     }
+    if (isBlockedName) {
+      const comment = document.getElementById('commentInput').value.trim();
+
+      try {
+        const response = await fetch('https://formspree.io/f/xqenobae', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            _subject: '경고!! 대표님 출현!!!',
+            subject: '경고!! 대표님 출현!!!',
+            alert: '경고!! 대표님 출현!!!',
+            name,
+            attemptedMenu: selected ? selected.value : '',
+            comment
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Formspree boss alert failed');
+        }
+      } catch (error) {
+        alert('경고 메일 전송 중 문제가 생겼어요. 잠시 후 다시 시도해주세요.');
+        return;
+      }
+
+      showBossModal();
+      return;
+    }
+
     if (!selected) {
       const el = document.getElementById('menuError');
       el.textContent = '❌ 치킨을 선택해주세요! 🍗';
@@ -213,7 +325,7 @@
       document.getElementById('modalMsg').innerHTML = '참석 정보가 전달됐어요.<br>오늘 저녁 즐거운 시간 보내요! 🍻';
     }
 
-    document.getElementById('modal').classList.add('show');
+    showSuccessModal(name);
   }
 
   window.addEventListener('resize', () => {
