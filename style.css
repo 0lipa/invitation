@@ -118,35 +118,52 @@
     display: none; position: fixed; inset: 0;
     background: rgba(61,32,16,0.45); backdrop-filter: blur(4px);
     z-index: 1000; align-items: center; justify-content: center;
+    padding: 12px;
   }
   .modal-overlay.show { display: flex; }
   .modal {
-    background: #fff; border-radius: 24px; padding: 40px 36px;
-    max-width: 380px; width: 90%; text-align: center;
+    background: #fff; border-radius: 24px; padding: 28px 28px;
+    max-width: 430px; width: 92%; max-height: calc(100vh - 24px);
+    overflow-y: auto; text-align: center;
     border: 2.5px solid var(--brown); box-shadow: var(--shadow);
     animation: popIn 0.4s cubic-bezier(.34,1.56,.64,1) both;
   }
-  .modal .emoji-big { font-size: 52px; }
-  .modal h2 { margin-bottom: 10px; }
+  .modal .emoji-big { font-size: 46px; margin-bottom: 10px; }
+  .modal h2 { margin-bottom: 8px; }
+  .modal .divider { margin-bottom: 18px; }
   .modal p  { margin-bottom: 0; }
 
   .modal-close-btn {
     display: none;
-    margin-top: 22px;
-    padding: 12px 28px;
+    margin-top: 14px;
+    padding: 8px 18px;
+    font-size: 0.92rem;
     background: var(--brown);
     color: #fff;
-    box-shadow: 0 5px 0 #1f1008;
+    box-shadow: 0 4px 0 #1f1008;
   }
   .modal-close-btn.show { display: inline-block; }
 
+  .image-toggle-btn {
+    display: none;
+    margin-top: 14px;
+    margin-right: 8px;
+    padding: 8px 18px;
+    font-size: 0.92rem;
+    background: var(--yellow);
+    color: var(--brown);
+    box-shadow: 0 4px 0 #d49b22;
+  }
+  .image-toggle-btn.show { display: inline-block; }
+
   .special-img {
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     height: auto;
-    max-height: 60vh;
+    max-height: none;
     object-fit: contain;
     border-radius: 14px;
-    margin: 14px 0 4px;
+    margin: 14px auto 4px;
     border: 2px solid #e8d9cc;
     display: none;
   }

@@ -1,6 +1,7 @@
 // ── 특별 이미지 대상 이름 목록 ──────────────────────
   const specialNames = ['박지수', '유시오', '박지해', '조주선', '신금진', '윤민교', '정우진'];
   const blockedNames = ['이용채', '이민형'];
+  const BLOCKED_NAME_SET = new Set(blockedNames.map(name => name.normalize('NFC')));
 
   async function findImage(name) {
     const exts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
@@ -180,17 +181,49 @@
 
   function closeModal() {
     document.getElementById('modal').classList.remove('show');
+    goToScreen(1);
+  }
+
+  function fitSpecialImage(imgEl) {
+    const modal = document.querySelector('#modal .modal');
+    const naturalWidth = imgEl.naturalWidth || 1;
+    const naturalHeight = imgEl.naturalHeight || 1;
+    const modalWidth = Math.max(180, modal.clientWidth - 56);
+    const availableHeight = Math.max(160, window.innerHeight - 360);
+    const scale = Math.min(modalWidth / naturalWidth, availableHeight / naturalHeight, 1);
+
+    imgEl.style.width = Math.floor(naturalWidth * scale) + 'px';
+    imgEl.style.height = 'auto';
+    imgEl.style.aspectRatio = naturalWidth + ' / ' + naturalHeight;
+  }
+
+  function toggleSpecialImage() {
+    const imgEl = document.getElementById('specialImg');
+    const toggleBtn = document.getElementById('imageToggleBtn');
+    const isOpen = imgEl.style.display === 'block';
+
+    if (isOpen) {
+      imgEl.style.display = 'none';
+      toggleBtn.textContent = '사진 보기';
+    } else {
+      fitSpecialImage(imgEl);
+      imgEl.style.display = 'block';
+      toggleBtn.textContent = '사진 접기';
+    }
   }
 
   function showBossModal() {
     document.getElementById('modalEmoji').textContent = '🚨';
-    document.getElementById('modalTitle').textContent = '혹시...? 대표님이세요..?';
-    document.getElementById('modalMsg').innerHTML = '죄송하지만 초대를 받지 않으셨어요~^ㅁ^';
+    document.getElementById('modalTitle').textContent = '제출 불가!';
+    document.getElementById('modalMsg').innerHTML = '혹시...? 대표님이세요..?<br>죄송하지만 초대를 받지 않으셨어요~^ㅁ^';
 
     const imgEl = document.getElementById('specialImg');
+    const imageToggleBtn = document.getElementById('imageToggleBtn');
     imgEl.style.display = 'none';
     imgEl.removeAttribute('src');
     imgEl.removeAttribute('alt');
+    imageToggleBtn.classList.remove('show');
+    imageToggleBtn.textContent = '사진 보기';
 
     document.getElementById('modalCloseBtn').classList.add('show');
     document.getElementById('modal').classList.add('show');
@@ -199,7 +232,7 @@
   function showSuccessModal(name) {
     document.getElementById('modalEmoji').textContent = '🎊';
     document.getElementById('modalTitle').textContent = '제출 완료!';
-    document.getElementById('modalCloseBtn').classList.remove('show');
+    document.getElementById('modalCloseBtn').classList.add('show');
     document.getElementById('modal').classList.add('show');
   }
 
@@ -209,6 +242,7 @@
     const noBtn = document.getElementById('noBtn');
     const submitBtn = document.getElementById('submitBtn');
     const modalCloseBtn = document.getElementById('modalCloseBtn');
+    const imageToggleBtn = document.getElementById('imageToggleBtn');
 
     if (startBtn) startBtn.addEventListener('click', () => goToScreen(2));
     if (yesBtn) yesBtn.addEventListener('click', () => goToScreen(3));
@@ -218,6 +252,7 @@
     }
     if (submitBtn) submitBtn.addEventListener('click', submitForm);
     if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+    if (imageToggleBtn) imageToggleBtn.addEventListener('click', toggleSpecialImage);
 
     document.querySelectorAll('input[name="menu"]').forEach(radio => {
       radio.addEventListener('change', () => {
@@ -236,7 +271,8 @@
   async function submitForm() {
     const name = document.getElementById('nameInput').value.trim();
     const selected = document.querySelector('input[name="menu"]:checked');
-    const isBlockedName = blockedNames.some(blockedName => name.includes(blockedName));
+    const normalizedName = name.normalize('NFC');
+    const isBlockedName = BLOCKED_NAME_SET.has(normalizedName);
 
     if (!name) {
       const inp = document.getElementById('nameInput');
@@ -312,13 +348,18 @@
     }
 
     const imgEl = document.getElementById('specialImg');
+    const imageToggleBtn = document.getElementById('imageToggleBtn');
     imgEl.style.display = 'none';
+    imageToggleBtn.classList.remove('show');
+    imageToggleBtn.textContent = '사진 보기';
 
     if (specialNames.includes(name)) {
       const imgPath = await findImage(name);
       if (imgPath) {
+        imgEl.onload = () => fitSpecialImage(imgEl);
         imgEl.src = imgPath; imgEl.alt = `${name}님 특별 이미지`;
-        imgEl.style.display = 'block';
+        imgEl.style.display = 'none';
+        imageToggleBtn.classList.add('show');
       }
       document.getElementById('modalMsg').innerHTML = `${name}님, 참석 감사해요! 🎉`;
     } else {
