@@ -204,11 +204,11 @@
 
     if (isOpen) {
       imgEl.style.display = 'none';
-      toggleBtn.textContent = '사진 보기';
+      toggleBtn.textContent = '초대장 보기';
     } else {
       fitSpecialImage(imgEl);
       imgEl.style.display = 'block';
-      toggleBtn.textContent = '사진 접기';
+      toggleBtn.textContent = '초대장 접기';
     }
   }
 
@@ -223,7 +223,7 @@
     imgEl.removeAttribute('src');
     imgEl.removeAttribute('alt');
     imageToggleBtn.classList.remove('show');
-    imageToggleBtn.textContent = '사진 보기';
+    imageToggleBtn.textContent = '초대장 보기';
 
     document.getElementById('modalCloseBtn').classList.add('show');
     document.getElementById('modal').classList.add('show');
@@ -351,7 +351,7 @@
     const imageToggleBtn = document.getElementById('imageToggleBtn');
     imgEl.style.display = 'none';
     imageToggleBtn.classList.remove('show');
-    imageToggleBtn.textContent = '사진 보기';
+    imageToggleBtn.textContent = '초대장 보기';
 
     if (specialNames.includes(name)) {
       const imgPath = await findImage(name);
