@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍻 팀 회식 참여 조사</title>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="bg-deco" id="bgDeco"></div>
+
+<!-- 화면 1: 메인 -->
+<div class="screen active" id="screen1">
+  <div class="card">
+    <span class="emoji-big">🍻</span>
+    <span class="tag">오늘 저녁</span>
+    <h1>안녕하세요~!</h1>
+    <div class="divider"></div>
+    <p>오늘 팀 회식?이 있어요..!<br>잠깐 시간 내서 참여 여부를 알려주시면<br>이것저것 알아볼게용😊</p>
+    <button class="btn btn-start" id="startBtn">참여 여부 알려주기 →</button>
+  </div>
+</div>
+
+<!-- 화면 2: 참여 여부 -->
+<div class="screen" id="screen2">
+  <div class="card">
+    <span class="emoji-big">🤔</span>
+    <span class="tag">참여 조사</span>
+    <h2>오늘 회식에<br>오실 수 있나요?</h2>
+    <div class="divider"></div>
+    <p>저녁 6시 이후, 회사 근처!<br>맛있는 거 먹어요! 🍖</p>
+    <div class="btn-group">
+      <button class="btn btn-yes" id="yesBtn">넹! 갑니다!🤩</button>
+    </div>
+    <div class="run-counter" id="runCounter"></div>
+  </div>
+  <button class="btn btn-no" id="noBtn">엥..아니오;😫</button>
+</div>
+
+<!-- 화면 3: 이름 + 메뉴 + 기대평 -->
+<div class="screen" id="screen3">
+  <div class="card scrollable" id="formCard">
+
+    <span class="emoji-big">✍️</span>
+    <span class="tag">참석자 정보</span>
+    <h2>참가하신다니! 기뻐요!!!^ㅁ^ 🎉</h2>
+    <div class="divider"></div>
+    <div class="info-row">📋 이름과 메뉴 선택 후 한 마디 남겨주세요!</div>
+
+    <div class="form-group">
+      <label>이름 *</label>
+      <input type="text" id="nameInput" placeholder="홍길동" maxlength="20">
+    </div>
+
+    <div class="form-group">
+      <label>🍗 오늘 먹고 싶은 치킨은? *</label>
+      <div class="menu-grid" id="menuGrid">
+        <div class="menu-item" data-value="네네치킨">
+          <input type="radio" name="menu" id="m1" value="네네치킨">
+          <label class="menu-label" for="m1">🐔 네네치킨</label>
+        </div>
+        <div class="menu-item" data-value="굽네치킨">
+          <input type="radio" name="menu" id="m2" value="굽네치킨">
+          <label class="menu-label" for="m2">🔥 굽네치킨</label>
+        </div>
+        <div class="menu-item kanbu" data-value="깐부치킨">
+          <input type="radio" name="menu" id="m3" value="깐부치킨">
+          <label class="menu-label" for="m3">❤️ 깐부치킨</label>
+        </div>
+        <div class="menu-item" data-value="BBQ">
+          <input type="radio" name="menu" id="m4" value="BBQ">
+          <label class="menu-label" for="m4">🍺 BBQ</label>
+        </div>
+        <div class="menu-item" data-value="BHC">
+          <input type="radio" name="menu" id="m5" value="BHC">
+          <label class="menu-label" for="m5">🌶️ BHC</label>
+        </div>
+        <div class="menu-item" data-value="교촌치킨">
+          <input type="radio" name="menu" id="m6" value="교촌치킨">
+          <label class="menu-label" for="m6">🍯 교촌치킨</label>
+        </div>
+      </div>
+      <div class="menu-error" id="menuError"></div>
+    </div>
+
+    <div class="form-group">
+      <label>기대평 (선택)</label>
+      <textarea id="commentInput" placeholder="오늘 회식 기대된다~ 🎊"></textarea>
+    </div>
+
+    <!-- 경고 문구 (깐부 아닌 거 선택 시 제출 버튼 바로 위에 등장) -->
+    <div class="dark-warning" id="darkWarning">
+      <p>정말요…?</p>
+      <p class="retry-message">다시 생각해보세요…</p>
+      <div class="sub">깐부치킨 세상 제일 가는 치킨인디..🥺</div>
+    </div>
+    <button class="btn btn-submit" id="submitBtn">제출하기 🚀</button>
+  </div>
+</div>
+
+<!-- 제출 완료 모달 -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <span class="emoji-big" id="modalEmoji">🎊</span>
+    <h2 id="modalTitle">제출 완료!</h2>
+    <div class="divider"></div>
+    <p id="modalMsg">시간 내주셔서 감사합니당<br>오늘 저녁에 봐요 꺄아ㅏ 🍻</p>
+    <img id="specialImg" class="special-img" src="" alt="">
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
